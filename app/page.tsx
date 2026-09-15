@@ -18,7 +18,7 @@ export default async function Home() {
   const user = userId
     ? await prisma.user.findUnique({
         where: { id: userId },
-        select: { username: true },
+          select: { username: true, profileImageFilename: true },
       })
     : null;
 
@@ -31,7 +31,10 @@ export default async function Home() {
           </Link>
 
           {user ? (
-            <UserMenu username={user.username} />
+            <UserMenu
+              username={user.username}
+              profileImageFilename={user.profileImageFilename}
+            />
           ) : (
             <NavigationMenu>
               <NavigationMenuList>

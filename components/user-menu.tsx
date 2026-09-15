@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { LogOut, Settings } from "lucide-react";
+import Link from "next/link";
+import { LogOut, Settings, UserRound } from "lucide-react";
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   HoverCard,
@@ -13,11 +14,14 @@ import {
 
 type UserMenuProps = {
   username: string;
+  profileImageFilename: string | null;
 };
 
-export function UserMenu({ username }: UserMenuProps) {
+export function UserMenu({ username, profileImageFilename }: UserMenuProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const initials = username.slice(0, 2).toUpperCase();
+  const profileImageUrl = profileImageFilename
+    ? `/uploads/${profileImageFilename}`
+    : undefined;
 
   async function handleLogout() {
     setIsLoggingOut(true);
@@ -43,13 +47,19 @@ export function UserMenu({ username }: UserMenuProps) {
         }
       >
         <Avatar size="sm">
-          <AvatarFallback>{initials}</AvatarFallback>
+          {profileImageUrl && <AvatarImage src={profileImageUrl} alt="" />}
+          <AvatarFallback>
+            <UserRound className="size-1/2" aria-hidden="true" />
+          </AvatarFallback>
         </Avatar>
       </HoverCardTrigger>
       <HoverCardContent className="flex flex-col gap-3">
         <div className="flex items-center gap-3">
           <Avatar>
-            <AvatarFallback>{initials}</AvatarFallback>
+            {profileImageUrl && <AvatarImage src={profileImageUrl} alt="" />}
+            <AvatarFallback>
+              <UserRound className="size-1/2" aria-hidden="true" />
+            </AvatarFallback>
           </Avatar>
           <div className="flex min-w-0 flex-col">
             <p className="truncate font-medium">{username}</p>
@@ -57,12 +67,13 @@ export function UserMenu({ username }: UserMenuProps) {
           </div>
         </div>
         <div className="flex flex-col gap-1">
-          <Button variant="ghost" className="justify-start" disabled>
+          <Button
+            variant="ghost"
+            className="justify-start"
+            render={<Link href="/user/settings" />}
+          >
             <Settings data-icon="inline-start" />
             Account settings
-            <span className="ml-auto text-xs text-muted-foreground">
-              Soon
-            </span>
           </Button>
           <Button
             variant="ghost"
