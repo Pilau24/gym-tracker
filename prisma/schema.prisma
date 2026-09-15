@@ -7,9 +7,10 @@ datasource db {
 }
 
 model User {
-  id          Int          @id @default(autoincrement())
-  username    String       @unique
-  createdAt   DateTime     @default(now()) @map("created_at")
+  id                   Int          @id @default(autoincrement())
+  username             String       @unique
+  profileImageFilename String?      @map("profile_image_filename")
+  createdAt            DateTime     @default(now()) @map("created_at")
   credentials Credential[]
 
   @@map("users")
