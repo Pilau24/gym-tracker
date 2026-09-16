@@ -23,7 +23,10 @@ export async function makeRegistrationOptions({ rpName, rpID, userID, userName }
     userID: Buffer.from(userID, 'utf-8'),
     userName,
     attestationType: 'none',
-    authenticatorSelection: { userVerification: 'preferred' },
+    authenticatorSelection: {
+      residentKey: 'required',
+      userVerification: 'preferred',
+    },
   });
 }
 
@@ -48,14 +51,11 @@ export async function verifyRegistration({
 
 export async function makeAuthenticationOptions({
   rpID,
-  allowCredentials,
 }: {
   rpID: string;
-  allowCredentials?: { id: string; type: 'public-key' }[];
 }) {
   return await generateAuthenticationOptions({
     rpID,
-    allowCredentials,
     userVerification: 'preferred',
   });
 }
