@@ -15,6 +15,7 @@ import {
   Utensils,
   Users,
 } from "lucide-react";
+import { ThemeMenu } from "@/components/theme-menu";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -195,6 +196,13 @@ export function SiteMenu({
               )}
               </SidebarMenu>
             </SidebarGroupContent>
+          </SidebarGroup>
+          <SidebarGroup className="mt-auto pb-2">
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <ThemeMenu />
+              </SidebarMenuItem>
+            </SidebarMenu>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>

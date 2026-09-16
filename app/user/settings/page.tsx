@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { getUserIdFromSession } from "@/lib/session";
 import { ImageUploader } from "@/components/image-uploader";
+import { ThemeMenu } from "@/components/theme-menu";
 
 export default async function UserSettingsPage() {
   const sessionToken = (await cookies()).get("passkey_session")?.value;
@@ -50,6 +51,15 @@ export default async function UserSettingsPage() {
               <Users className="size-5 shrink-0" aria-hidden="true" />
               Friends (coming soon)
             </div>
+          </div>
+          <div className="flex items-center justify-between gap-4 rounded-lg border p-4">
+            <div className="flex flex-col gap-1">
+              <h2 className="text-sm font-medium">Theme</h2>
+              <p className="text-sm text-muted-foreground">
+                Choose how the app should look on this device.
+              </p>
+            </div>
+            <ThemeMenu inSettings />
           </div>
           <div id="profile-picture">
             <ImageUploader
