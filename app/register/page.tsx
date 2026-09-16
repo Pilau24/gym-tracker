@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { startRegistration } from "@simplewebauthn/browser";
 import { Fingerprint, LoaderCircle, ShieldCheck } from "lucide-react";
 
@@ -31,6 +32,7 @@ const GENERIC_REGISTER_ERROR =
   "We couldn't create a passkey. Check your details and try again.";
 
 export default function RegisterPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
@@ -71,7 +73,7 @@ export default function RegisterPage() {
         throw new Error(GENERIC_REGISTER_ERROR);
       }
 
-      window.location.assign("/login");
+      router.push("/login");
     } catch (registrationError) {
       setError(
         registrationError instanceof Error &&

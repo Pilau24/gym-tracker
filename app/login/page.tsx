@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { startAuthentication } from "@simplewebauthn/browser";
 import { Fingerprint, LoaderCircle, ShieldCheck } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import {
   Card,
@@ -30,6 +31,7 @@ const GENERIC_LOGIN_ERROR =
   "We couldn't sign you in with that passkey. Check your details and try again.";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
@@ -72,7 +74,7 @@ export default function LoginPage() {
         throw new Error(GENERIC_LOGIN_ERROR);
       }
 
-      window.location.assign("/");
+      router.push("/");
     } catch (authenticationError) {
       setError(
         authenticationError instanceof Error
