@@ -14,14 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Field,
-  FieldDescription,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { FieldError } from "@/components/ui/field";
 import { Button } from "@/components/ui/button";
 
 type AuthenticationOptions = Parameters<typeof startAuthentication>[0]["optionsJSON"] & {
@@ -32,7 +25,6 @@ const GENERIC_LOGIN_ERROR =
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [isAuthenticating, setIsAuthenticating] = useState(false);
 
@@ -45,7 +37,7 @@ export default function LoginPage() {
       const optionsResponse = await fetch("/api/auth/login/options", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({}),
       });
 
       const options = (await optionsResponse.json()) as
@@ -105,31 +97,8 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit}>
           <CardContent>
-            <FieldGroup className="gap-5">
-              <Field data-invalid={Boolean(error)}>
-                <FieldLabel className="font-medium" htmlFor="username">
-                  Username
-                </FieldLabel>
-                <Input
-                  id="username"
-                  name="username"
-                  autoComplete="username webauthn"
-                  placeholder="you@example.com"
-                  value={username}
-                  onChange={(event) => setUsername(event.target.value)}
-                  aria-invalid={Boolean(error)}
-                  required
-                  disabled={isAuthenticating}
-                />
-                {error ? (
-                  <FieldError>{error}</FieldError>
-                ) : (
-                  <FieldDescription>
-                    Use the username associated with your passkey.
-                  </FieldDescription>
-                )}
-              </Field>
-
+            <div className="flex flex-col gap-5">
+              {error && <FieldError>{error}</FieldError>}
               <Button
                 type="submit"
                 className="w-full"
@@ -147,7 +116,7 @@ export default function LoginPage() {
                 )}
                 {isAuthenticating ? "Waiting for passkey..." : "Continue with passkey"}
               </Button>
-            </FieldGroup>
+            </div>
           </CardContent>
         </form>
 
