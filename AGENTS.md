@@ -22,6 +22,13 @@
 - The project MCP configuration includes `next-devtools`, which exposes version-accurate Next.js documentation and live development-server context to connected agents.
 - If the user has not confirmed completion, report the current status and leave the changes uncommitted.
 
+<!-- BEGIN:nextjs-agent-rules -->
+# This is NOT the Next.js you know
+ 
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+<!-- END:nextjs-agent-rules -->
+
 ## Development server
 
 - Assume the Next.js development server is already running when working on this project.

@@ -17,10 +17,8 @@ const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 const ACCEPTED_TYPES = "image/jpeg,image/png,image/gif,image/webp";
 
 export function ImageUploader({
-  username,
   profileImageFilename,
 }: {
-  username: string;
   profileImageFilename: string | null;
 }) {
   const router = useRouter();
@@ -90,16 +88,19 @@ export function ImageUploader({
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Upload a profile picture</CardTitle>
+      <CardHeader className="gap-2">
+        <CardTitle className="text-xl font-semibold">
+          Upload a profile picture
+        </CardTitle>
         <CardDescription>
-          Signed in as {username}. Your profile picture must be a JPEG, PNG, GIF, or WebP image no larger than 2 MB.
+          Your profile picture must be a JPEG, PNG, GIF, or WebP image no larger
+          than 2 MB.
         </CardDescription>
       </CardHeader>
       <CardContent className="gap-4">
         <button
           type="button"
-          className={`flex min-h-48 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-6 text-center transition-colors ${
+          className={`flex min-h-48 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-6 text-center text-sm transition-colors ${
             isDragging ? "border-primary bg-muted" : "border-border hover:bg-muted/50"
           }`}
           onClick={() => inputRef.current?.click()}
@@ -116,14 +117,20 @@ export function ImageUploader({
         >
           {previewUrl || currentProfileImageUrl ? (
             <img
-              src={previewUrl ?? currentProfileImageUrl}
-              alt={previewUrl ? "Selected profile picture preview" : "Current profile picture"}
+              src={previewUrl ?? currentProfileImageUrl ?? ""}
+              alt={
+                previewUrl
+                  ? "Selected profile picture preview"
+                  : "Current profile picture"
+              }
               className="max-h-40 max-w-full rounded object-contain"
             />
           ) : (
             <>
               <Upload className="size-8 text-muted-foreground" aria-hidden="true" />
-              <span className="font-medium">Drag and drop an image here</span>
+              <span className="font-medium text-foreground">
+                Drag and drop an image here
+              </span>
               <span className="text-sm text-muted-foreground">or click to browse</span>
             </>
           )}
@@ -135,7 +142,11 @@ export function ImageUploader({
           className="sr-only"
           onChange={(event) => chooseFile(event.target.files?.[0])}
         />
-        {message && <p className="text-sm text-muted-foreground" role="status">{message}</p>}
+        {message && (
+          <p className="text-sm text-muted-foreground" role="status">
+            {message}
+          </p>
+        )}
       </CardContent>
       <CardFooter className="border-t pt-6">
         <Button type="button" disabled={!file || isUploading} onClick={uploadImage}>
