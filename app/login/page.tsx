@@ -96,8 +96,8 @@ export default function LoginPage() {
             <Fingerprint aria-hidden="true" className="size-6" />
           </div>
           <div className="flex flex-col gap-2">
-            <CardTitle className="text-2xl">Welcome back</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl font-semibold">Welcome back</CardTitle>
+            <CardDescription className="text-sm leading-6">
               Sign in securely with the passkey saved on your device.
             </CardDescription>
           </div>
@@ -105,9 +105,11 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit}>
           <CardContent>
-            <FieldGroup>
+            <FieldGroup className="gap-5">
               <Field data-invalid={Boolean(error)}>
-                <FieldLabel htmlFor="username">Username</FieldLabel>
+                <FieldLabel className="font-medium" htmlFor="username">
+                  Username
+                </FieldLabel>
                 <Input
                   id="username"
                   name="username"
@@ -137,11 +139,11 @@ export default function LoginPage() {
                 {isAuthenticating ? (
                   <LoaderCircle
                     aria-hidden="true"
-                    className="animate-spin"
+                    className="size-4 animate-spin"
                     data-icon="inline-start"
                   />
                 ) : (
-                  <ShieldCheck data-icon="inline-start" aria-hidden="true" />
+                  <ShieldCheck className="size-4" data-icon="inline-start" aria-hidden="true" />
                 )}
                 {isAuthenticating ? "Waiting for passkey..." : "Continue with passkey"}
               </Button>

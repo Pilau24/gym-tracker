@@ -94,8 +94,8 @@ export default function RegisterPage() {
             <Fingerprint aria-hidden="true" className="size-6" />
           </div>
           <div className="flex flex-col gap-2">
-            <CardTitle className="text-2xl">Create your passkey</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-2xl font-semibold">Create your passkey</CardTitle>
+            <CardDescription className="text-sm leading-6">
               Set up secure, passwordless sign-in on this device.
             </CardDescription>
           </div>
@@ -103,9 +103,11 @@ export default function RegisterPage() {
 
         <form onSubmit={handleSubmit}>
           <CardContent>
-            <FieldGroup>
+            <FieldGroup className="gap-5">
               <Field data-invalid={Boolean(error)}>
-                <FieldLabel htmlFor="username">Username</FieldLabel>
+                <FieldLabel className="font-medium" htmlFor="username">
+                  Username
+                </FieldLabel>
                 <Input
                   id="username"
                   name="username"
@@ -135,11 +137,11 @@ export default function RegisterPage() {
                 {isRegistering ? (
                   <LoaderCircle
                     aria-hidden="true"
-                    className="animate-spin"
+                    className="size-4 animate-spin"
                     data-icon="inline-start"
                   />
                 ) : (
-                  <ShieldCheck data-icon="inline-start" aria-hidden="true" />
+                  <ShieldCheck className="size-4" data-icon="inline-start" aria-hidden="true" />
                 )}
                 {isRegistering
                   ? "Waiting for passkey..."
