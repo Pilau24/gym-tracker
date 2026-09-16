@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { Upload } from "lucide-react";
 import {
   Card,
@@ -29,21 +30,20 @@ export function ImageUploader({
     : undefined;
   const inputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>();
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<string>();
 
-  useEffect(() => {
-    if (!file) {
-      setPreviewUrl(undefined);
-      return;
-    }
+  const previewUrl = useMemo(
+    () => (file ? URL.createObjectURL(file) : undefined),
+    [file],
+  );
 
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    return () => URL.revokeObjectURL(url);
-  }, [file]);
+  useEffect(() => {
+    if (previewUrl) {
+      return () => URL.revokeObjectURL(previewUrl);
+    }
+  }, [previewUrl]);
 
   function chooseFile(candidate: File | undefined) {
     setMessage(undefined);
@@ -115,9 +115,12 @@ export function ImageUploader({
           }}
         >
           {previewUrl || currentProfileImageUrl ? (
-            <img
+            <Image
               src={previewUrl ?? currentProfileImageUrl}
               alt={previewUrl ? "Selected profile picture preview" : "Current profile picture"}
+              width={160}
+              height={160}
+              unoptimized
               className="max-h-40 max-w-full rounded object-contain"
             />
           ) : (
