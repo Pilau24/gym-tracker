@@ -76,6 +76,7 @@ export async function POST(req: Request) {
     await prisma.credential.create({
       data: {
         credentialId: storedCredentialId,
+        friendlyName: registrationSession.friendlyName,
         publicKey,
         internalUserId: Number(registrationSession.userId),
         webauthnUserId: storedCredentialId,

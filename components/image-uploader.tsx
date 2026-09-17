@@ -19,8 +19,10 @@ const ACCEPTED_TYPES = "image/jpeg,image/png,image/gif,image/webp";
 
 export function ImageUploader({
   profileImageFilename,
+  compact = false,
 }: {
   profileImageFilename: string | null;
+  compact?: boolean;
 }) {
   const router = useRouter();
   const currentProfileImageUrl = profileImageFilename
@@ -87,20 +89,19 @@ export function ImageUploader({
   }
 
   return (
-    <Card>
+    <Card size={compact ? "sm" : "default"}>
       <CardHeader className="gap-2">
-        <CardTitle className="text-xl font-semibold">
-          Upload a profile picture
-        </CardTitle>
+        <CardTitle>{compact ? "Profile picture" : "Upload a profile picture"}</CardTitle>
         <CardDescription>
-          Your profile picture must be a JPEG, PNG, GIF, or WebP image no larger
-          than 2 MB.
+          {compact
+            ? "JPEG, PNG, GIF, or WebP up to 2 MB."
+            : "Your profile picture must be a JPEG, PNG, GIF, or WebP image no larger than 2 MB."}
         </CardDescription>
       </CardHeader>
       <CardContent className="gap-4">
         <button
           type="button"
-          className={`flex min-h-48 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-6 text-center text-sm transition-colors ${
+          className={`flex ${compact ? "min-h-28" : "min-h-48"} w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-6 text-center text-sm transition-colors ${
             isDragging ? "border-primary bg-muted" : "border-border hover:bg-muted/50"
           }`}
           onClick={() => inputRef.current?.click()}

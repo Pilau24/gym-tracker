@@ -8,15 +8,10 @@ import {
   House,
   LogIn,
   LogOut,
-  Trophy,
-  Settings,
   UserPlus,
   UserRound,
   Utensils,
-  Users,
 } from "lucide-react";
-import { ThemeMenu } from "@/components/theme-menu";
-
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -112,24 +107,10 @@ export function SiteMenu({
                 >
                   <DropdownMenuItem
                     className="text-sm font-medium text-popover-foreground"
-                    render={<Link href="/achievements" />}
+                    render={<Link href="/account" />}
                   >
-                    <Trophy />
-                    Records
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-sm font-medium text-popover-foreground"
-                    disabled
-                  >
-                    <Users />
-                    Friends (coming soon)
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-sm font-medium text-popover-foreground"
-                    render={<Link href="/user/settings" />}
-                  >
-                    <Settings />
-                    Account settings
+                    <UserRound />
+                    Account
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-sm font-medium text-destructive"
@@ -197,13 +178,6 @@ export function SiteMenu({
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
-          <SidebarGroup className="mt-auto pb-2">
-            <SidebarMenu>
-              <SidebarMenuItem>
-                <ThemeMenu />
-              </SidebarMenuItem>
-            </SidebarMenu>
-          </SidebarGroup>
         </SidebarContent>
       </Sidebar>
 
@@ -231,10 +205,10 @@ export function SiteMenu({
         })}
         {isAuthenticated && username ? (
           <Link
-            href="/user/settings"
+            href="/account"
             aria-label="Open profile settings"
             className={`flex h-14 min-w-0 flex-1 items-center justify-center rounded-xl outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring ${
-              pathname.startsWith("/user")
+              pathname.startsWith("/account")
                 ? "bg-accent text-accent-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}

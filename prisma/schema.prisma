@@ -18,6 +18,7 @@ model User {
 
 model Credential {
   credentialId   String    @id @map("cred_id")
+  friendlyName   String    @default("Passkey") @map("friendly_name")
   publicKey      Bytes     @map("cred_public_key")
   internalUserId Int       @map("internal_user_id")
   webauthnUserId String    @map("webauthn_user_id")

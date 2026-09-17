@@ -34,6 +34,7 @@ const GENERIC_REGISTER_ERROR =
 export default function RegisterPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
+  const [friendlyName, setFriendlyName] = useState("");
   const [error, setError] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
 
@@ -46,7 +47,7 @@ export default function RegisterPage() {
       const optionsResponse = await fetch("/api/auth/register/options", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({ username, friendlyName }),
       });
       const options = (await optionsResponse.json()) as
         | RegistrationOptions
@@ -126,6 +127,25 @@ export default function RegisterPage() {
                     This identifies your account when you sign in.
                   </FieldDescription>
                 )}
+              </Field>
+
+              <Field>
+                <FieldLabel className="font-medium" htmlFor="friendly-name">
+                  Passkey name
+                </FieldLabel>
+                <Input
+                  id="friendly-name"
+                  name="friendlyName"
+                  placeholder="e.g. Work laptop"
+                  value={friendlyName}
+                  onChange={(event) => setFriendlyName(event.target.value)}
+                  maxLength={80}
+                  disabled={isRegistering}
+                />
+                <FieldDescription>
+                  Helps you recognize this passkey later. You won&apos;t be
+                  able to change it afterwards.
+                </FieldDescription>
               </Field>
 
               <Button
