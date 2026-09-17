@@ -50,5 +50,8 @@ next-env.d.ts
 # Database
 dev.db
 
+# User uploads
+/public/uploads/
+
 # Local package archives
 .artifacts/

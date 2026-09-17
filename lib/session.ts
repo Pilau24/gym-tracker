@@ -11,8 +11,8 @@ function getSessionSecret() {
   return secret ?? "passkey-auth-template-development-secret";
 }
 
-export function createSessionToken(userId: number) {
-  const payload = `${userId}.${Math.floor(Date.now() / 1000)}`;
+export function createSessionToken(userId: number, credentialId?: string) {
+  const payload = `${userId}.${credentialId ?? ""}.${Math.floor(Date.now() / 1000)}`;
   const encodedPayload = Buffer.from(payload).toString("base64url");
   const signature = createHmac("sha256", getSessionSecret())
     .update(encodedPayload)
@@ -22,6 +22,10 @@ export function createSessionToken(userId: number) {
 }
 
 export function getUserIdFromSession(token: string | undefined) {
+  return getSessionFromToken(token)?.userId;
+}
+
+export function getSessionFromToken(token: string | undefined) {
   if (!token) return undefined;
 
   const [encodedPayload, signature] = token.split(".");
@@ -41,7 +45,10 @@ export function getUserIdFromSession(token: string | undefined) {
   }
 
   const payload = Buffer.from(encodedPayload, "base64url").toString("utf8");
-  const [rawUserId, rawIssuedAt] = payload.split(".");
+  const parts = payload.split(".");
+  const rawUserId = parts[0];
+  const credentialId = parts.length === 3 ? parts[1] : undefined;
+  const rawIssuedAt = parts.length === 3 ? parts[2] : parts[1];
   const userId = Number(rawUserId);
   const issuedAt = Number(rawIssuedAt);
   const now = Math.floor(Date.now() / 1000);
@@ -56,5 +63,5 @@ export function getUserIdFromSession(token: string | undefined) {
     return undefined;
   }
 
-  return userId;
+  return { userId, credentialId };
 }

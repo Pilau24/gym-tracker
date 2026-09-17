@@ -7,13 +7,13 @@ type StoredChallenge<T> = {
 
 const registrationChallenges = new Map<
   string,
-  StoredChallenge<{ challenge: string; userId: string }>
+  StoredChallenge<{ challenge: string; userId: string; friendlyName: string }>
 >();
 const authChallenges = new Map<string, StoredChallenge<string>>();
 
 export function storeRegistrationChallenge(
   key: string,
-  value: { challenge: string; userId: string },
+  value: { challenge: string; userId: string; friendlyName: string },
 ) {
   registrationChallenges.set(key, {
     value,

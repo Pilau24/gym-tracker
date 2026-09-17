@@ -93,7 +93,7 @@ export async function POST(req: Request) {
     const response = NextResponse.json({ verified: true });
     response.cookies.set({
       name: 'passkey_session',
-      value: createSessionToken(stored.internalUserId),
+      value: createSessionToken(stored.internalUserId, stored.credentialId),
       httpOnly: true,
       sameSite: 'lax',
       secure: new URL(req.url).protocol === 'https:',
