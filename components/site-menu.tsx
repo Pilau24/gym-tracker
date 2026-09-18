@@ -13,6 +13,7 @@ import {
   Utensils,
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { formatUsername } from "@/lib/username";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -96,7 +97,7 @@ export function SiteMenu({
                   </Avatar>
                   <span className="flex min-w-0 flex-col text-left group-data-[collapsible=icon]:hidden">
                     <span className="truncate font-medium capitalize">
-                      {username}
+                      {formatUsername(username)}
                     </span>
                   </span>
                 </DropdownMenuTrigger>
@@ -205,10 +206,10 @@ export function SiteMenu({
         })}
         {isAuthenticated && username ? (
           <Link
-            href="/account"
-            aria-label="Open profile settings"
+            href={`/profile/${encodeURIComponent(username)}`}
+            aria-label="Open profile"
             className={`flex h-14 min-w-0 flex-1 items-center justify-center rounded-xl outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring ${
-              pathname.startsWith("/account")
+              pathname.startsWith("/profile")
                 ? "bg-accent text-accent-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}

@@ -5,6 +5,7 @@ import { prisma } from "@/lib/db";
 import { getSessionFromToken } from "@/lib/session";
 import { LogoutButton } from "@/components/logout-button";
 import { ThemeMenu } from "@/components/theme-menu";
+import { formatUsername } from "@/lib/username";
 
 export default async function AccountPage() {
   const sessionToken = (await cookies()).get("passkey_session")?.value;
@@ -32,7 +33,7 @@ export default async function AccountPage() {
             <>
               Account{" "}
               <span className="font-normal text-muted-foreground">
-                · {user.username}
+                · {formatUsername(user.username)}
               </span>
             </>
           ) : (
@@ -50,7 +51,7 @@ export default async function AccountPage() {
             <h2 className="text-sm font-medium">Account</h2>
             <div className="grid gap-3 sm:grid-cols-2">
               <Link
-                href="/account/profile"
+                href={`/profile/${encodeURIComponent(user.username)}`}
                 className="flex min-h-24 flex-col justify-between gap-3 rounded-lg border p-4 transition-colors hover:bg-muted"
               >
                 <UserRound

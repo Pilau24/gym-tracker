@@ -55,8 +55,12 @@ export async function POST(request: Request) {
   }
 
   const file = formData.get("image");
+  const target = formData.get("target");
   if (!(file instanceof File)) {
     return NextResponse.json({ error: "An image file is required." }, { status: 400 });
+  }
+  if (target !== "profile" && target !== "banner") {
+    return NextResponse.json({ error: "An image target is required." }, { status: 400 });
   }
 
   const imageType = file.type;
@@ -87,7 +91,10 @@ export async function POST(request: Request) {
   await writeFile(path.join(UPLOAD_DIRECTORY, filename), bytes, { flag: "wx" });
   await prisma.user.update({
     where: { id: user.id },
-    data: { profileImageFilename: filename },
+    data:
+      target === "banner"
+        ? { bannerImageFilename: filename }
+        : { profileImageFilename: filename },
   });
 
   return NextResponse.json(

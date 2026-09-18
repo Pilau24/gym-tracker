@@ -34,6 +34,7 @@ const GENERIC_REGISTER_ERROR =
 export default function RegisterPage() {
   const router = useRouter();
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [friendlyName, setFriendlyName] = useState("");
   const [error, setError] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
@@ -47,7 +48,7 @@ export default function RegisterPage() {
       const optionsResponse = await fetch("/api/auth/register/options", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, friendlyName }),
+        body: JSON.stringify({ username, email, friendlyName }),
       });
       const options = (await optionsResponse.json()) as
         | RegistrationOptions
@@ -113,9 +114,10 @@ export default function RegisterPage() {
                   id="username"
                   name="username"
                   autoComplete="username"
-                  placeholder="you@example.com"
+                  placeholder="athlete123"
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
+                  pattern="[A-Za-z0-9]+"
                   aria-invalid={Boolean(error)}
                   required
                   disabled={isRegistering}
@@ -124,9 +126,29 @@ export default function RegisterPage() {
                   <FieldError>{error}</FieldError>
                 ) : (
                   <FieldDescription>
-                    This identifies your account when you sign in.
+                    Use 1-80 letters and numbers only.
                   </FieldDescription>
                 )}
+              </Field>
+
+              <Field>
+                <FieldLabel className="font-medium" htmlFor="email">
+                  Email
+                </FieldLabel>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  maxLength={254}
+                  disabled={isRegistering}
+                />
+                <FieldDescription>
+                  Optional. Used to keep your contact email separate from your username.
+                </FieldDescription>
               </Field>
 
               <Field>
