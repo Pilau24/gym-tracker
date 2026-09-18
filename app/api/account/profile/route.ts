@@ -2,6 +2,10 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { getSessionFromToken } from "@/lib/session";
+import {
+  isValidUsername,
+  USERNAME_MAX_LENGTH,
+} from "@/lib/username";
 
 export async function PATCH(request: Request) {
   const session = getSessionFromToken(
@@ -15,9 +19,11 @@ export async function PATCH(request: Request) {
   const username =
     typeof body.username === "string" ? body.username.trim() : "";
 
-  if (!username || username.length > 80) {
+  if (!isValidUsername(username)) {
     return NextResponse.json(
-      { error: "Username must be between 1 and 80 characters." },
+      {
+        error: `Username must be 1-${USERNAME_MAX_LENGTH} characters and contain only letters and numbers.`,
+      },
       { status: 400 },
     );
   }

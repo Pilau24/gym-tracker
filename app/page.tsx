@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { cookies } from "next/headers";
-import { prisma } from "@/lib/db";
+import { Settings } from "lucide-react";
 import { getUserIdFromSession } from "@/lib/session";
+import { prisma } from "@/lib/db";
 
 import { SiteMenu } from "@/components/site-menu";
+import { Button } from "@/components/ui/button";
 import {
   NavigationMenu,
   NavigationMenuItem,
@@ -45,7 +47,17 @@ export default async function Home() {
                 </Link>
               </div>
 
-              {!user && (
+              {user ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  render={<Link href="/account" />}
+                  nativeButton={false}
+                  aria-label="Open settings"
+                >
+                  <Settings />
+                </Button>
+              ) : (
                 <div className="flex items-center">
                   <NavigationMenu>
                     <NavigationMenuList>

@@ -83,6 +83,7 @@ export function ProfileSettings({
                   name="username"
                   value={nextUsername}
                   onChange={(event) => setNextUsername(event.target.value)}
+                  pattern="[A-Za-z0-9]+"
                   maxLength={80}
                   required
                   aria-invalid={Boolean(error)}
@@ -92,7 +93,7 @@ export function ProfileSettings({
                   <FieldError>{error}</FieldError>
                 ) : (
                   <FieldDescription>
-                    This identifies you in the app.
+                    Use 1-80 letters and numbers only.
                   </FieldDescription>
                 )}
               </Field>

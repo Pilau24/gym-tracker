@@ -4,6 +4,7 @@ import { getRpID, makeRegistrationOptions } from '@/lib/webauthn';
 import { authDebug, authDebugError } from '@/lib/authDebug';
 import { cookies } from 'next/headers';
 import { getSessionFromToken } from '@/lib/session';
+import { isValidEmail, isValidUsername } from '@/lib/username';
 
 // In-memory challenge store for demo purposes. In production use a durable session store.
 import { storeRegistrationChallenge } from '@/lib/challengeStore';
@@ -27,12 +28,17 @@ export async function POST(req: Request) {
   }
 
   const username = typeof body.username === 'string' ? body.username.trim() : '';
+  const email = typeof body.email === 'string' ? body.email.trim() : '';
   const friendlyName = typeof body.friendlyName === 'string'
     ? body.friendlyName.trim().slice(0, 80)
     : 'Passkey';
   const session = getSessionFromToken((await cookies()).get('passkey_session')?.value);
   const authenticatedUserId = session?.userId;
-  if (!username && !authenticatedUserId) {
+  if (
+    (!username && !authenticatedUserId) ||
+    (username && !isValidUsername(username)) ||
+    (email && !isValidEmail(email))
+  ) {
     authDebug('register-options:invalid-username', { requestId });
     return NextResponse.json({ error: REGISTER_ERROR }, { status: 400 });
   }
@@ -43,7 +49,9 @@ export async function POST(req: Request) {
       ? await prisma.user.findUnique({ where: { id: authenticatedUserId } })
       : await prisma.user.findUnique({ where: { username } });
     if (!user) {
-      user = await prisma.user.create({ data: { username } });
+      user = await prisma.user.create({
+        data: { username, email: email || null },
+      });
     }
 
     const rpName = process.env.RP_NAME ?? 'Passkey Auth Template';
