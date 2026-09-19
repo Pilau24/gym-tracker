@@ -324,7 +324,7 @@ export function ProfileShowcase({ editable = false }: { editable?: boolean }) {
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
-      <div className="grid min-w-0 grid-cols-4 auto-rows-[clamp(8rem,12vw,9rem)] gap-4">
+      <div className="grid min-w-0 grid-cols-2 auto-rows-[clamp(8rem,12vw,9rem)] gap-4 sm:grid-cols-4">
         {widgets.map((widget) => (
           <WidgetFrame
             key={widget.id}

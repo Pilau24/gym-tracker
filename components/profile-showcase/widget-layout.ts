@@ -66,11 +66,11 @@ export const widgetDefinitions: readonly WidgetDefinition[] = [
 
 export const widgetSizeClasses: Record<WidgetSize, string> = {
   "1x1": "col-span-1 row-span-1",
-  "1x2": "col-span-2 row-span-1",
-  "1x4": "col-span-4 row-span-1",
-  "2x1": "col-span-1 row-span-2",
+  "1x2": "col-span-2 row-span-1 sm:col-span-1 sm:row-span-2",
+  "1x4": "col-span-2 row-span-2 sm:col-span-1 sm:row-span-4",
+  "2x1": "col-span-2 row-span-2",
   "2x2": "col-span-2 row-span-2",
-  "2x4": "col-span-4 row-span-2",
+  "2x4": "col-span-2 row-span-2 sm:row-span-4",
 };
 
 export const widgetSizeDimensions: Record<

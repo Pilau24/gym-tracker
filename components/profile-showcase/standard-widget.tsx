@@ -21,7 +21,7 @@ export function StandardWidget({
         className,
       )}
     >
-      <CardHeader className="h-16 shrink-0 gap-1 overflow-hidden px-3 py-2.5">
+      <CardHeader className="min-h-16 shrink-0 gap-1 overflow-hidden px-3 py-2.5">
         <CardTitle className="flex min-w-0 items-center gap-1.5 truncate text-sm [&>svg]:size-4">
           {icon}
           <span className="truncate">{label}</span>

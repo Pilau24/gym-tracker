@@ -46,7 +46,7 @@ export default async function ProfilePage({
         profileImageFilename={profile.profileImageFilename}
       />
       <SidebarInset>
-        <div className="min-h-screen bg-muted/30 text-foreground">
+        <div className="min-h-screen touch-pan-y bg-muted/30 text-foreground">
           <header className="h-14 border-b bg-background">
             <div className="mx-auto flex h-full w-full max-w-6xl items-center justify-between px-4 sm:px-6">
               <div className="flex items-center gap-3">
