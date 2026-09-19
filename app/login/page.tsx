@@ -81,7 +81,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-muted/30 px-6 py-12">
+    <div className="flex min-h-full items-center justify-center bg-muted/30 px-6 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="gap-4 text-center">
           <div className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -132,6 +132,6 @@ export default function LoginPage() {
           </p>
         </CardFooter>
       </Card>
-    </main>
+    </div>
   );
 }

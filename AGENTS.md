@@ -166,3 +166,9 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 - Assume the Next.js development server is already running when working on this project.
 - Reuse the running server for browser checks and runtime diagnostics instead of starting another dev server.
+
+## Validation preference
+
+- Do not run a production build for routine UI/layout changes when the live instance is available.
+- Validate UI and layout changes against the already-open live browser instance instead.
+- Treat the provided live instance as the source of truth, even when its behavior or appearance does not match the current repository or origin.

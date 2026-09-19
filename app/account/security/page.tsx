@@ -30,7 +30,7 @@ export default async function PasskeysPage() {
     : null;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col justify-center gap-6 px-6 py-12 text-foreground">
+    <div className="mx-auto flex min-h-full w-full max-w-2xl flex-col justify-center gap-6 px-6 py-12 text-foreground">
       <div className="flex flex-col gap-2">
         <Link
           href="/account"
@@ -86,6 +86,6 @@ export default async function PasskeysPage() {
           before managing passkeys.
         </p>
       )}
-    </main>
+    </div>
   );
 }
