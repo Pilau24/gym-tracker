@@ -20,7 +20,7 @@ export default async function AccountPage() {
     : null;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-8 px-6 py-12 text-foreground">
+    <div className="mx-auto flex min-h-full w-full max-w-2xl flex-col gap-8 px-6 py-12 text-foreground">
       <header className="flex flex-col gap-3">
         <Link
           href="/"
@@ -129,6 +129,6 @@ export default async function AccountPage() {
           before managing your account.
         </p>
       )}
-    </main>
+    </div>
   );
 }

@@ -10,6 +10,9 @@ import {
   type ThemeMode,
 } from "@/components/theme-provider";
 import { cookies } from "next/headers";
+import { AppShell } from "@/components/app-shell";
+import { getUserIdFromSession } from "@/lib/session";
+import { prisma } from "@/lib/db";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -77,11 +80,29 @@ export default async function RootLayout({ children }: LayoutProps<"/">) {
 })();`}
         </Script>
       </head>
-      <body className="flex min-h-full flex-col">
+      <body className="h-dvh overflow-hidden">
         <ThemeProvider initialMode={initialMode} initialTheme={initialTheme}>
-          <TooltipProvider>{children}</TooltipProvider>
+          <TooltipProvider>
+            <AppShell
+              user={await getCurrentUser()}
+            >
+              {children}
+            </AppShell>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>
   );
+}
+
+async function getCurrentUser() {
+  const sessionToken = (await cookies()).get("passkey_session")?.value;
+  const userId = getUserIdFromSession(sessionToken);
+
+  return userId
+    ? prisma.user.findUnique({
+        where: { id: userId },
+        select: { username: true, profileImageFilename: true },
+      })
+    : null;
 }
