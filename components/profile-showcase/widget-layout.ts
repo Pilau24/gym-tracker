@@ -8,70 +8,93 @@ export type ShowcaseId =
 
 export type WidgetSize = "1x1" | "1x2" | "1x4" | "2x1" | "2x2" | "2x4";
 
+export type WidgetSizes = {
+  sm: WidgetSize;
+  md: WidgetSize;
+  lg: WidgetSize;
+};
+
+export type WidgetSettings = Record<string, unknown>;
+
 export type WidgetState = {
-  id: ShowcaseId;
-  size: WidgetSize;
+  id: string;
+  sizes: WidgetSizes;
+  settings: WidgetSettings;
 };
 
 export type WidgetDefinition = {
   id: ShowcaseId;
   label: string;
-  defaultSize: WidgetSize;
+  defaultSizes: WidgetSizes;
+  defaultSettings: WidgetSettings;
   allowedSizes: readonly WidgetSize[];
 };
 
 export type StandardWidgetProps = {
+  sizes: WidgetSizes;
   allowedSizes: readonly WidgetSize[];
   label: ReactNode;
   icon: ReactNode;
   sublabel: ReactNode;
   children: ReactNode;
+  editable?: boolean;
   className?: string;
   contentClassName?: string;
 };
 
 export const defaultWidgets: WidgetState[] = [
-  { id: "achievements", size: "1x4" },
-  { id: "activity", size: "2x4" },
-  { id: "coverage", size: "2x1" },
-  { id: "progress-goals", size: "2x1" },
+  {
+    id: "achievements",
+    sizes: { sm: "2x4", md: "2x2", lg: "2x2" },
+    settings: {},
+  },
+  {
+    id: "activity",
+    sizes: { sm: "2x4", md: "2x2", lg: "2x2" },
+    settings: {},
+  },
+  {
+    id: "coverage",
+    sizes: { sm: "2x4", md: "2x2", lg: "2x1" },
+    settings: {},
+  },
+  {
+    id: "progress-goals",
+    sizes: { sm: "2x4", md: "2x2", lg: "2x2" },
+    settings: {},
+  },
 ];
 
 export const widgetDefinitions: readonly WidgetDefinition[] = [
   {
     id: "achievements",
     label: "Achievement Showcase",
-    defaultSize: "1x4",
-    allowedSizes: ["1x2", "1x4"],
+    defaultSizes: { sm: "2x4", md: "2x2", lg: "2x2" },
+    defaultSettings: {},
+    allowedSizes: ["2x2"],
   },
   {
     id: "activity",
     label: "Recent Activity",
-    defaultSize: "2x4",
-    allowedSizes: ["2x2", "2x4"],
+    defaultSizes: { sm: "2x4", md: "2x2", lg: "2x2" },
+    defaultSettings: {},
+    allowedSizes: ["2x2"],
   },
   {
     id: "coverage",
     label: "Coverage",
-    defaultSize: "2x1",
-    allowedSizes: ["2x1"],
+    defaultSizes: { sm: "2x4", md: "2x2", lg: "2x1" },
+    defaultSettings: {},
+    allowedSizes: ["2x1", "2x2"],
   },
   {
     id: "progress-goals",
     label: "Progress Goals",
-    defaultSize: "2x1",
-    allowedSizes: ["2x1"],
+    defaultSizes: { sm: "2x4", md: "2x2", lg: "2x2" },
+    defaultSettings: {},
+    allowedSizes: ["2x2"],
   },
 ];
-
-export const widgetSizeClasses: Record<WidgetSize, string> = {
-  "1x1": "col-span-1 row-span-1",
-  "1x2": "col-span-2 row-span-1",
-  "1x4": "col-span-4 row-span-1",
-  "2x1": "col-span-1 row-span-2",
-  "2x2": "col-span-2 row-span-2",
-  "2x4": "col-span-4 row-span-2",
-};
 
 export const widgetSizeDimensions: Record<
   WidgetSize,

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getSessionFromToken } from "@/lib/session";
 import { ProfileHero } from "@/components/profile-hero";
 import { ProfileShowcase } from "@/components/profile-showcase";
+import { loadProfileWidgets } from "@/lib/profile-widgets";
 
 export default async function ProfilePage({
   params,
@@ -28,6 +29,7 @@ export default async function ProfilePage({
   if (!profile || profile.username !== username) {
     notFound();
   }
+  const widgets = await loadProfileWidgets(profile.id);
 
   return (
     <div className="min-h-full bg-muted/30 text-foreground">
@@ -39,7 +41,7 @@ export default async function ProfilePage({
           action="edit"
         />
         <div className="flex flex-col gap-4 px-4 pt-4 sm:px-6">
-          <ProfileShowcase />
+          <ProfileShowcase initialWidgets={widgets} />
         </div>
       </div>
     </div>

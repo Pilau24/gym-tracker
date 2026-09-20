@@ -183,7 +183,7 @@ export function ProfileHero({
   return (
     <>
       <section className="relative">
-      <div className="sticky top-0 z-0">
+      <div>
         <button
           type="button"
           className="group relative block h-32 w-full overflow-hidden bg-primary/10 text-left outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"

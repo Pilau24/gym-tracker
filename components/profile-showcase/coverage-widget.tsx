@@ -16,7 +16,7 @@ import {
   type ChartConfig,
 } from "@/components/ui/chart";
 import { StandardWidget } from "./standard-widget";
-import type { WidgetSize } from "./widget-layout";
+import type { WidgetSize, WidgetSizes } from "./widget-layout";
 
 export type CoverageArea =
   | "back"
@@ -149,7 +149,7 @@ const CoverageChart = memo(function CoverageChart({
   return (
     <ChartContainer
       config={chartConfig}
-      className="mx-auto aspect-square h-full max-h-[180px] max-w-[180px] w-full [&_.recharts-surface]:overflow-visible"
+      className="mx-auto aspect-square h-full max-h-full max-w-full w-full [&_.recharts-surface]:overflow-visible"
       onMouseDown={(event) => event.preventDefault()}
     >
       <RadarChart
@@ -215,19 +215,25 @@ const CoverageChart = memo(function CoverageChart({
 
 export const CoverageWidget = memo(function CoverageWidget({
   rows = getCoverageQueryRows(new Date()),
+  sizes,
   allowedSizes,
+  editable,
 }: {
   rows?: readonly CoverageQueryRow[];
+  sizes: WidgetSizes;
   allowedSizes: readonly WidgetSize[];
+  editable?: boolean;
 }) {
   const [currentMonth, previousMonth] = rows;
 
   return (
     <StandardWidget
       allowedSizes={allowedSizes}
+      sizes={sizes}
       label="Coverage"
       icon={<ScanLine aria-hidden="true" />}
       sublabel={`Coverage for ${currentMonth.month} compared with ${previousMonth.month}.`}
+      editable={editable}
       contentClassName="flex"
     >
       <div className="flex min-h-0 flex-1 items-center justify-center overflow-hidden rounded-none border border-dashed bg-muted/30 p-1">

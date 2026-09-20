@@ -1,8 +1,26 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import type { DragEvent, PointerEvent } from "react";
-import { Grip, Minus, Plus } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type { CSSProperties } from "react";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  rectSortingStrategy,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { AchievementsWidget } from "./achievements-widget";
@@ -13,58 +31,31 @@ import { ProgressGoalsWidget } from "./progress-goals-widget";
 import {
   defaultWidgets,
   widgetDefinitions,
-  widgetSizeClasses,
   widgetSizeDimensions,
   type ShowcaseId,
-  type WidgetSize,
+  type WidgetSizes,
   type WidgetState,
 } from "./widget-layout";
 
 const achievementItems: readonly AchievementItem[] = [
-  { label: "Featured" },
-  { label: "Milestones" },
-  { label: "Perfect runs" },
-  { label: "Collections" },
+  { id: "featured", label: "Featured" },
+  { id: "milestones", label: "Milestones" },
+  { id: "perfect-runs", label: "Perfect runs" },
+  { id: "collections", label: "Collections" },
 ];
 
 const coverageRows = getCoverageQueryRows(new Date());
 
-function getResizedWidgetSize(
-  size: WidgetSize,
-  deltaX: number,
-  deltaY: number,
-  allowedSizes: readonly WidgetSize[],
-): WidgetSize {
-  const horizontal = Math.abs(deltaX) >= Math.abs(deltaY);
-  const currentDimensions = widgetSizeDimensions[size];
-  const dimension = horizontal ? "width" : "height";
-  const delta = horizontal ? deltaX : deltaY;
-
-  if (Math.abs(delta) <= 24) return size;
-
-  const candidates = allowedSizes
-    .filter((candidate) => {
-      const candidateDimension = widgetSizeDimensions[candidate][dimension];
-      return delta > 0
-        ? candidateDimension > currentDimensions[dimension]
-        : candidateDimension < currentDimensions[dimension];
-    })
-    .sort((left, right) => {
-      const leftDimension = widgetSizeDimensions[left][dimension];
-      const rightDimension = widgetSizeDimensions[right][dimension];
-      return delta > 0
-        ? leftDimension - rightDimension
-        : rightDimension - leftDimension;
-    });
-
-  return candidates[0] ?? size;
-}
-
-function getWidgetDefinition(id: ShowcaseId) {
+function getWidgetDefinition(id: string) {
   return widgetDefinitions.find((definition) => definition.id === id);
 }
 
-function renderWidget(id: ShowcaseId) {
+function renderWidget(
+  id: string,
+  sizes: WidgetSizes,
+  settings: Record<string, unknown>,
+  editable: boolean,
+) {
   const definition = getWidgetDefinition(id);
   if (!definition) return null;
 
@@ -72,222 +63,199 @@ function renderWidget(id: ShowcaseId) {
     return (
       <AchievementsWidget
         items={achievementItems}
+        settings={settings}
+        sizes={sizes}
         allowedSizes={definition.allowedSizes}
+        editable={editable}
       />
     );
   }
 
   if (id === "activity") {
-    return <ActivityWidget allowedSizes={definition.allowedSizes} />;
+    return (
+      <ActivityWidget
+        allowedSizes={definition.allowedSizes}
+        sizes={sizes}
+        editable={editable}
+      />
+    );
   }
 
   if (id === "coverage") {
     return (
       <CoverageWidget
         rows={coverageRows}
+        sizes={sizes}
         allowedSizes={definition.allowedSizes}
+        editable={editable}
       />
     );
   }
 
-  return <ProgressGoalsWidget allowedSizes={definition.allowedSizes} />;
+  return (
+    <ProgressGoalsWidget
+      sizes={sizes}
+      settings={settings}
+      allowedSizes={definition.allowedSizes}
+      editable={editable}
+    />
+  );
 }
 
 function WidgetFrame({
   widget,
-  allowedSizes,
-  displaySize,
   editable,
-  isDragged,
-  isResizing,
-  onDragStart,
-  onDragOver,
-  onDrop,
-  onDragEnd,
   onRemove,
-  onResizePreview,
-  onResizeEnd,
-  onResizeCancel,
   children,
 }: {
   widget: WidgetState;
-  allowedSizes: readonly WidgetSize[];
-  displaySize: WidgetSize;
   editable: boolean;
-  isDragged: boolean;
-  isResizing: boolean;
-  onDragStart: (id: ShowcaseId) => void;
-  onDragOver: (id: ShowcaseId, event: DragEvent<HTMLDivElement>) => void;
-  onDrop: (id: ShowcaseId) => void;
-  onDragEnd: () => void;
-  onRemove: (id: ShowcaseId) => void;
-  onResizePreview: (id: ShowcaseId, size: WidgetSize) => void;
-  onResizeEnd: (id: ShowcaseId, size: WidgetSize) => void;
-  onResizeCancel: () => void;
+  onRemove: (id: string) => void;
   children: React.ReactNode;
 }) {
-  const isResizable = allowedSizes.length > 1;
-  const resizeStart = useRef<{
-    pointerId: number;
-    x: number;
-    y: number;
-  } | null>(null);
-
-  function handleResizeStart(event: PointerEvent<HTMLButtonElement>) {
-    if (!isResizable) return;
-    event.preventDefault();
-    event.stopPropagation();
-    resizeStart.current = {
-      pointerId: event.pointerId,
-      x: event.clientX,
-      y: event.clientY,
-    };
-    event.currentTarget.setPointerCapture(event.pointerId);
-  }
-
-  function handleResizeMove(event: PointerEvent<HTMLButtonElement>) {
-    const start = resizeStart.current;
-    if (!start || start.pointerId !== event.pointerId) return;
-    onResizePreview(
-      widget.id,
-      getResizedWidgetSize(
-        widget.size,
-        event.clientX - start.x,
-        event.clientY - start.y,
-        allowedSizes,
-      ),
-    );
-  }
-
-  function handleResizeEnd(event: PointerEvent<HTMLButtonElement>) {
-    if (resizeStart.current?.pointerId !== event.pointerId) return;
-    onResizeEnd(
-      widget.id,
-      getResizedWidgetSize(
-        widget.size,
-        event.clientX - resizeStart.current.x,
-        event.clientY - resizeStart.current.y,
-        allowedSizes,
-      ),
-    );
-    resizeStart.current = null;
-    event.currentTarget.releasePointerCapture(event.pointerId);
-  }
-
-  function handleResizeCancel(event: PointerEvent<HTMLButtonElement>) {
-    if (resizeStart.current?.pointerId !== event.pointerId) return;
-    resizeStart.current = null;
-    onResizeCancel();
-  }
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({
+      id: widget.id,
+      disabled: !editable,
+    });
 
   const label = getWidgetDefinition(widget.id)?.label ?? widget.id;
+  const smDimensions = widgetSizeDimensions[widget.sizes.sm];
+  const mdDimensions = widgetSizeDimensions[widget.sizes.md];
+  const lgDimensions = widgetSizeDimensions[widget.sizes.lg];
+  const gridStyle: CSSProperties & {
+    "--widget-sm-columns": number;
+    "--widget-sm-rows": number;
+    "--widget-md-columns": number;
+    "--widget-md-rows": number;
+    "--widget-lg-columns": number;
+    "--widget-lg-rows": number;
+  } = {
+    "--widget-sm-columns": smDimensions.width,
+    "--widget-sm-rows": smDimensions.height,
+    "--widget-md-columns": mdDimensions.width,
+    "--widget-md-rows": mdDimensions.height,
+    "--widget-lg-columns": lgDimensions.width,
+    "--widget-lg-rows": lgDimensions.height,
+    transform: CSS.Transform.toString(transform) ?? undefined,
+    transition,
+  };
 
   return (
     <div
+      ref={setNodeRef}
+      {...attributes}
+      {...listeners}
       data-widget-id={widget.id}
-      data-widget-size={displaySize}
-      draggable={editable}
-      onDragStart={() => editable && onDragStart(widget.id)}
-      onDragOver={
-        editable ? (event) => onDragOver(widget.id, event) : undefined
-      }
-      onDrop={() => editable && onDrop(widget.id)}
-      onDragEnd={editable ? onDragEnd : undefined}
+      data-widget-size-sm={widget.sizes.sm}
+      data-widget-size-md={widget.sizes.md}
+      data-widget-size-lg={widget.sizes.lg}
       className={cn(
-        "relative min-w-0 transition-opacity duration-150",
-        widgetSizeClasses[displaySize],
-        editable && "group/widget cursor-grab active:cursor-grabbing",
-        isDragged && "opacity-40",
-        isResizing && "opacity-40 outline-2 outline-dashed outline-primary/60",
+        "relative min-w-0 select-none [grid-column:span_var(--widget-sm-columns)] [grid-row:span_var(--widget-sm-rows)]",
+        "md:[grid-column:span_var(--widget-md-columns)] md:[grid-row:span_var(--widget-md-rows)]",
+        "lg:[grid-column:span_var(--widget-lg-columns)] lg:[grid-row:span_var(--widget-lg-rows)]",
+        editable && "max-sm:[grid-row:span_1]",
+        editable && "group/widget touch-none cursor-grab",
+        isDragging && "z-50",
       )}
+      style={gridStyle}
     >
       {children}
       {editable && (
         <>
           <Button
             type="button"
-            variant="destructive"
+            variant="ghost"
             size="icon-xs"
-            className="absolute -right-2 -top-2 z-20 rounded-none"
+            className="absolute right-0 top-0 z-20 h-14 w-10 rounded-none border-0 border-l border-border/70 bg-transparent p-0 text-muted-foreground shadow-none hover:bg-transparent hover:text-destructive sm:h-16 [&_svg]:size-4"
             onClick={() => onRemove(widget.id)}
             aria-label={`Remove ${label}`}
           >
-            <Minus />
+            <X />
           </Button>
-          <button
-            type="button"
-            disabled={!isResizable}
-            className={cn(
-              "absolute -bottom-1 -right-1 z-20 flex size-6 items-end justify-end bg-primary p-0.5 text-primary-foreground opacity-70 transition-opacity focus-visible:opacity-100",
-              isResizable
-                ? "cursor-se-resize hover:opacity-100"
-                : "cursor-not-allowed opacity-30",
-            )}
-            onPointerDown={handleResizeStart}
-            onPointerMove={handleResizeMove}
-            onPointerUp={handleResizeEnd}
-            onPointerCancel={handleResizeCancel}
-            aria-label={
-              isResizable
-                ? `Resize ${label} (${widget.size})`
-                : `${label} cannot be resized`
-            }
-          >
-            <Grip className="size-3" aria-hidden="true" />
-          </button>
         </>
       )}
     </div>
   );
 }
 
-export function ProfileShowcase({ editable = false }: { editable?: boolean }) {
-  const [widgets, setWidgets] = useState<WidgetState[]>(defaultWidgets);
-  const [draggedId, setDraggedId] = useState<ShowcaseId | null>(null);
-  const [resizePreview, setResizePreview] = useState<{
-    id: ShowcaseId;
-    size: WidgetSize;
-  } | null>(null);
-  const renderedWidgets = useMemo(
-    () => ({
-      achievements: renderWidget("achievements"),
-      activity: renderWidget("activity"),
-      coverage: renderWidget("coverage"),
-      "progress-goals": renderWidget("progress-goals"),
-    }),
-    [],
+export function ProfileShowcase({
+  editable = false,
+  initialWidgets = defaultWidgets,
+}: {
+  editable?: boolean;
+  initialWidgets?: readonly WidgetState[];
+}) {
+  const [widgets, setWidgets] = useState<WidgetState[]>(() =>
+    initialWidgets.map((widget) => ({
+      ...widget,
+      sizes: { ...widget.sizes },
+      settings: { ...widget.settings },
+    })),
   );
-
-  function previewWidgetPosition(
-    targetId: ShowcaseId,
-    event: DragEvent<HTMLDivElement>,
-  ) {
-    event.preventDefault();
-    if (!draggedId || draggedId === targetId) return;
-    const targetBounds = event.currentTarget.getBoundingClientRect();
-    const sourceIndex = widgets.findIndex((widget) => widget.id === draggedId);
-    const targetIndex = widgets.findIndex((widget) => widget.id === targetId);
-    if (sourceIndex < 0 || targetIndex < 0) return;
-
-    const movingForward = sourceIndex < targetIndex;
-    const deadband = 24;
-    const crossedTarget = movingForward
-      ? event.clientY > targetBounds.top + targetBounds.height / 2 + deadband
-      : event.clientY < targetBounds.bottom - targetBounds.height / 2 - deadband;
-    if (!crossedTarget) return;
-
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const lastSavedWidgets = useRef(JSON.stringify(initialWidgets));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 300, tolerance: 5 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+  function handleDragEnd({ active, over }: DragEndEvent) {
+    if (!over || active.id === over.id) return;
     setWidgets((current) => {
-      const sourceIndex = current.findIndex((widget) => widget.id === draggedId);
-      const targetIndex = current.findIndex((widget) => widget.id === targetId);
-      if (sourceIndex < 0 || targetIndex < 0) return current;
-      const next = [...current];
-      const [moved] = next.splice(sourceIndex, 1);
-      next.splice(targetIndex, 0, moved);
+      const oldIndex = current.findIndex((widget) => widget.id === active.id);
+      const newIndex = current.findIndex((widget) => widget.id === over.id);
+      const next =
+        oldIndex < 0 || newIndex < 0
+          ? current
+          : arrayMove(current, oldIndex, newIndex);
       return next;
     });
   }
 
-  function removeWidget(id: ShowcaseId) {
+  const saveWidgets = useCallback((nextWidgets: readonly WidgetState[]) => {
+    setSaveError(null);
+    void fetch("/api/profile/widgets", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        widgets: nextWidgets.map(({ id, sizes, settings }) => ({
+          widgetType: id,
+          sizes,
+          settings,
+        })),
+      }),
+    }).then(async (response) => {
+      if (!response.ok) {
+        const body = (await response.json()) as { error?: unknown };
+        throw new Error(
+          typeof body.error === "string"
+            ? body.error
+            : "Unable to save widget layout.",
+        );
+      }
+    }).catch((error: unknown) => {
+      setSaveError(
+        error instanceof Error ? error.message : "Unable to save widget layout.",
+      );
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!editable) return;
+    const serializedWidgets = JSON.stringify(widgets);
+    if (serializedWidgets === lastSavedWidgets.current) return;
+    lastSavedWidgets.current = serializedWidgets;
+    saveWidgets(widgets);
+  }, [editable, saveWidgets, widgets]);
+
+  function removeWidget(id: string) {
     setWidgets((current) => current.filter((widget) => widget.id !== id));
   }
 
@@ -296,26 +264,12 @@ export function ProfileShowcase({ editable = false }: { editable?: boolean }) {
     if (!definition) return;
     setWidgets((current) => [
       ...current,
-      { id, size: definition.defaultSize },
+      {
+        id,
+        sizes: definition.defaultSizes,
+        settings: definition.defaultSettings,
+      },
     ]);
-  }
-
-  function previewWidgetResize(id: ShowcaseId, size: WidgetSize) {
-    const definition = getWidgetDefinition(id);
-    if (!definition || !definition.allowedSizes.includes(size)) return;
-    setResizePreview({ id, size });
-  }
-
-  function commitWidgetResize(id: ShowcaseId, size: WidgetSize) {
-    const definition = getWidgetDefinition(id);
-    if (!definition || !definition.allowedSizes.includes(size)) {
-      setResizePreview(null);
-      return;
-    }
-    setWidgets((current) =>
-      current.map((widget) => (widget.id === id ? { ...widget, size } : widget)),
-    );
-    setResizePreview(null);
   }
 
   const availableWidgets = widgetDefinitions.filter(
@@ -324,31 +278,45 @@ export function ProfileShowcase({ editable = false }: { editable?: boolean }) {
 
   return (
     <div className="flex min-w-0 flex-col gap-4">
-      <div className="grid min-w-0 grid-cols-4 auto-rows-[clamp(8rem,12vw,9rem)] gap-4">
-        {widgets.map((widget) => (
-          <WidgetFrame
-            key={widget.id}
-            widget={widget}
-            allowedSizes={getWidgetDefinition(widget.id)?.allowedSizes ?? []}
-            displaySize={
-              resizePreview?.id === widget.id ? resizePreview.size : widget.size
-            }
-            editable={editable}
-            isDragged={draggedId === widget.id}
-            isResizing={resizePreview?.id === widget.id}
-            onDragStart={setDraggedId}
-            onDragOver={previewWidgetPosition}
-            onDrop={() => setDraggedId(null)}
-            onDragEnd={() => setDraggedId(null)}
-            onRemove={removeWidget}
-            onResizePreview={previewWidgetResize}
-            onResizeEnd={commitWidgetResize}
-            onResizeCancel={() => setResizePreview(null)}
+      {saveError && (
+        <p className="border border-destructive bg-destructive/10 p-2 text-sm text-destructive">
+          {saveError}
+        </p>
+      )}
+      <DndContext
+        id="profile-showcase"
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext
+          items={widgets.map((widget) => widget.id)}
+          strategy={rectSortingStrategy}
+        >
+          <div
+            className={cn(
+              "grid min-w-0 grid-cols-4 auto-rows-[clamp(6rem,24vw,8rem)] gap-3 sm:auto-rows-[clamp(7rem,12vw,9rem)] sm:gap-4",
+              editable && "max-md:auto-rows-[auto]",
+            )}
           >
-            {renderedWidgets[widget.id]}
-          </WidgetFrame>
-        ))}
-      </div>
+            {widgets.map((widget) => (
+              <WidgetFrame
+                key={widget.id}
+                widget={widget}
+                editable={editable}
+                onRemove={removeWidget}
+              >
+                {renderWidget(
+                  widget.id,
+                  widget.sizes,
+                  widget.settings,
+                  editable,
+                )}
+              </WidgetFrame>
+            ))}
+          </div>
+        </SortableContext>
+      </DndContext>
       {editable && availableWidgets.length > 0 && (
         <section className="border border-dashed bg-card p-4">
           <div className="flex items-center justify-between gap-3">

@@ -14,8 +14,25 @@ model User {
   bannerImageFilename  String?      @map("banner_image_filename")
   createdAt            DateTime     @default(now()) @map("created_at")
   credentials Credential[]
+  profileWidgets       ProfileWidget[]
 
   @@map("users")
+}
+
+model ProfileWidget {
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  widgetType      String   @map("widget_type")
+  position        Int
+  configuration   String   @default("{}")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, widgetType])
+  @@index([userId, position])
+  @@map("profile_widgets")
 }
 
 model Credential {
