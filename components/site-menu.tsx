@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   CalendarDays,
-  Dumbbell,
+  Activity,
   House,
   LogIn,
   LogOut,
@@ -41,7 +41,7 @@ type SiteMenuProps = {
 const navigationItems = [
   { href: "/", label: "Home", icon: House },
   { href: "/meals", label: "Nutrition", icon: Utensils },
-  { href: "/workouts", label: "Training", icon: Dumbbell },
+  { href: "/activity", label: "Activity", icon: Activity },
   { href: "/schedule", label: "Schedule", icon: CalendarDays },
 ];
 
