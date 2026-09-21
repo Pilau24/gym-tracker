@@ -28,7 +28,7 @@ export default async function EditPage() {
 
   return (
     <div className="min-h-full bg-muted/30 text-foreground">
-      <div className="mx-auto flex w-full max-w-6xl flex-col pb-24 md:pb-6">
+      <div className="mx-auto flex w-full max-w-6xl flex-col pb-6">
         <ProfileHero
           username={user.username}
           profileImageFilename={user.profileImageFilename}
