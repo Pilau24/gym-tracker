@@ -1,5 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft, CalendarDays, Dumbbell } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 function isValidDate(value: string) {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
@@ -20,21 +28,41 @@ export default async function ActivityDatePage({
 
   return (
     <div className="min-h-full bg-muted/30 px-4 py-6 text-foreground sm:px-6">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6">
         <div>
           <Link
             href="/activity"
-            className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+            className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
           >
+            <ArrowLeft className="size-4" aria-hidden="true" />
             Back to activity
           </Link>
-          <h1 className="mt-2 text-xl font-semibold tracking-tight">
-            Activity for {ymdate}
-          </h1>
+          <p className="mt-5 text-sm font-medium text-muted-foreground">
+            Daily activity
+          </p>
+          <h1 className="mt-1 text-2xl font-semibold tracking-tight">{ymdate}</h1>
         </div>
-        <section className="border bg-card p-4 text-sm text-muted-foreground">
-          No activity details recorded for this date yet.
-        </section>
+        <Card className="rounded-none shadow-none">
+          <CardHeader className="border-b">
+            <CardTitle className="flex items-center gap-2">
+              <CalendarDays className="size-4" aria-hidden="true" />
+              No activity recorded
+            </CardTitle>
+            <CardDescription>
+              Workout details for this date will appear here after you log a
+              session.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="flex min-h-48 flex-col items-center justify-center gap-2 text-center">
+            <Dumbbell
+              className="size-8 text-muted-foreground/50"
+              aria-hidden="true"
+            />
+            <p className="text-sm text-muted-foreground">
+              Nothing to review yet.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

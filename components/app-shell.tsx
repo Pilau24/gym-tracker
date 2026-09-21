@@ -12,6 +12,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { SiteMenu } from "@/components/site-menu";
 
 type AppShellProps = {
@@ -78,8 +79,13 @@ export function AppShell({ children, user }: AppShellProps) {
             )}
           </div>
         </header>
-        <main className="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-          {children}
+        <main className="min-h-0 flex-1 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+          <ScrollArea
+            className="h-full overscroll-contain"
+            pullToRefresh
+          >
+            {children}
+          </ScrollArea>
         </main>
       </div>
     </SidebarProvider>
