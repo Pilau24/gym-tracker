@@ -24,26 +24,6 @@
         }
       }
     },
-    "shadcn": {
-      "command": "npx",
-      "args": [
-        "shadcn@latest",
-        "mcp"
-      ],
-      "type": "stdio"
-    },
-    "next-devtools": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "next-devtools-mcp@latest"
-      ],
-      "type": "stdio"
-    },
-    "github": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/"
-    },
     "org.nextjs.mcp": {
       "type": "stdio",
       "command": "pnpm",

@@ -42,10 +42,12 @@ yarn-error.log*
 next-env.d.ts
 
 # IDE-specific directories
-.agents/
 .claude/
 .cursor/
 .devin/
+.idea/
+.vscode/
+.zed/settings.json
 
 # Database
 dev.db
