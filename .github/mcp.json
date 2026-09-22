@@ -1,6 +1,6 @@
 {
   "servers": {
-    "io.github.mcp": {
+    "github": {
       "type": "http",
       "url": "https://api.githubcopilot.com/mcp/"
     },
@@ -24,23 +24,30 @@
         }
       }
     },
-    "org.nextjs.mcp": {
-      "type": "stdio",
-      "command": "pnpm",
+    "firefox-devtools": {
+      "command": "pnx",
       "args": [
-        "dlx",
-        "-y",
-        "next-devtools-mcp@latest"
+        "--allow-build=geckodriver@6.0.2",
+        "@mozilla/firefox-devtools-mcp@latest",
+        "--tool-preset developer",
+        "--connect-existing --marionette-port 2828"
       ]
     },
-    "com.shadcn.mcp": {
-      "type": "stdio",
-      "command": "pnpm",
+    "next-devtools": {
+      "command": "npx",
       "args": [
-        "dlx",
+        "-y",
+        "next-devtools-mcp@latest"
+      ],
+      "type": "stdio"
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": [
         "shadcn@latest",
         "mcp"
-      ]
+      ],
+      "type": "stdio"
     },
     "io.reui.copilot": {
       "type": "http",

@@ -4,6 +4,8 @@ import { getSessionFromToken } from "@/lib/session";
 import {
   isWidgetSettings,
   isWidgetSizes,
+  isKnownWidgetType,
+  normalizeWidgetType,
   replaceProfileWidgets,
   type ProfileWidgetInput,
 } from "@/lib/profile-widgets";
@@ -15,7 +17,11 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 function isWidgetInput(value: unknown): value is ProfileWidgetInput {
   if (!isRecord(value) || typeof value.widgetType !== "string") return false;
   if (!/^[a-z0-9][a-z0-9_-]{0,63}$/.test(value.widgetType)) return false;
-  return isWidgetSizes(value.sizes) && isWidgetSettings(value.settings);
+  return (
+    isKnownWidgetType(normalizeWidgetType(value.widgetType)) &&
+    isWidgetSizes(value.sizes) &&
+    isWidgetSettings(value.settings)
+  );
 }
 
 export async function PUT(request: Request) {
@@ -45,7 +51,9 @@ export async function PUT(request: Request) {
     );
   }
 
-  const widgetTypes = body.widgets.map((widget) => widget.widgetType);
+  const widgetTypes = body.widgets.map((widget) =>
+    normalizeWidgetType(widget.widgetType),
+  );
   if (new Set(widgetTypes).size !== widgetTypes.length) {
     return NextResponse.json(
       { error: "Each widget type may only appear once." },
@@ -53,6 +61,12 @@ export async function PUT(request: Request) {
     );
   }
 
-  await replaceProfileWidgets(session.userId, body.widgets);
+  await replaceProfileWidgets(
+    session.userId,
+    body.widgets.map((widget) => ({
+      ...widget,
+      widgetType: normalizeWidgetType(widget.widgetType),
+    })),
+  );
   return NextResponse.json({ saved: body.widgets.length });
 }

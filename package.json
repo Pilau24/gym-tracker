@@ -34,6 +34,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "firefox:dev": "firefox -P developer --no-remote --marionette --remote-debugging-port 9222 --width 1280 --height 720 about:blank",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
