@@ -47,6 +47,7 @@ next-env.d.ts
 .devin/
 .idea/
 .vscode/
+.zed/settings.json
 
 # Database
 dev.db
