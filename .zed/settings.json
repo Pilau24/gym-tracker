@@ -1,9 +1,6 @@
 {
-  "servers": {
-    "io.github.mcp": {
-      "type": "http",
-      "url": "https://api.githubcopilot.com/mcp/"
-    },
+  "show_edit_predictions": false,
+  "context_servers": {
     "io.github.ChromeDevTools/chrome-devtools-mcp": {
       "type": "stdio",
       "command": "npx",
