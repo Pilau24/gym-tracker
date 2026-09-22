@@ -58,7 +58,7 @@
    git status --short
    ```
 
-4. Restore stashed work when needed:
+4. Restore stashed work when neede d:
 
    ```powershell
    git stash list
