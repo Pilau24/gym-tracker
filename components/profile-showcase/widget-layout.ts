@@ -4,7 +4,8 @@ export type ShowcaseId =
   | "achievements"
   | "activity"
   | "coverage"
-  | "progress-goals";
+  | "progress-goals"
+  | "timeline";
 
 export type WidgetSize = "1x1" | "1x2" | "1x4" | "2x1" | "2x2" | "2x4";
 
@@ -38,6 +39,7 @@ export type StandardWidgetProps = {
   sublabel: ReactNode;
   children: ReactNode;
   editable?: boolean;
+  loading?: boolean;
   className?: string;
   contentClassName?: string;
 };
@@ -75,7 +77,14 @@ export const widgetDefinitions: readonly WidgetDefinition[] = [
   },
   {
     id: "activity",
-    label: "Recent Activity",
+    label: "Activity History",
+    defaultSizes: { sm: "2x4", md: "2x2", lg: "2x2" },
+    defaultSettings: {},
+    allowedSizes: ["2x2"],
+  },
+  {
+    id: "timeline",
+    label: "Timeline",
     defaultSizes: { sm: "2x4", md: "2x2", lg: "2x2" },
     defaultSettings: {},
     allowedSizes: ["2x2"],

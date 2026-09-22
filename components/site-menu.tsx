@@ -70,6 +70,8 @@ export function SiteMenu({
   const profileImageUrl = profileImageFilename
     ? `/uploads/${profileImageFilename}`
     : undefined;
+  const mobileNavItemClass =
+    "flex h-14 min-w-0 flex-1 basis-0 items-center justify-center rounded-xl px-1 transition-colors";
 
   return (
     <>
@@ -194,7 +196,7 @@ export function SiteMenu({
               key={item.href}
               href={item.href}
               aria-label={item.label}
-              className={`flex h-14 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-xl px-1 text-xs font-medium transition-colors ${
+              className={`${mobileNavItemClass} ${
                 isActive(item.href)
                   ? "bg-accent text-accent-foreground"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -208,7 +210,7 @@ export function SiteMenu({
           <Link
             href={`/profile/${encodeURIComponent(username)}`}
             aria-label="Open profile"
-            className={`flex h-14 min-w-0 flex-1 items-center justify-center rounded-xl outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring ${
+            className={`${mobileNavItemClass} outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring ${
               pathname.startsWith("/profile")
                 ? "bg-accent text-accent-foreground"
                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -227,13 +229,13 @@ export function SiteMenu({
           <>
             <Link
               href="/login"
-              className="flex h-14 min-w-0 flex-1 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className={`${mobileNavItemClass} text-muted-foreground hover:bg-muted hover:text-foreground`}
             >
               <LogIn className="size-6" aria-hidden="true" />
             </Link>
             <Link
               href="/register"
-              className="flex h-14 min-w-0 flex-1 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              className={`${mobileNavItemClass} text-muted-foreground hover:bg-muted hover:text-foreground`}
             >
               <UserPlus className="size-6" aria-hidden="true" />
             </Link>

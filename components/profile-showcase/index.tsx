@@ -28,6 +28,7 @@ import type { AchievementItem } from "./achievements-widget";
 import { ActivityWidget } from "./activity-widget";
 import { CoverageWidget, getCoverageQueryRows } from "./coverage-widget";
 import { ProgressGoalsWidget } from "./progress-goals-widget";
+import { TimelineWidget } from "./timeline-widget";
 import {
   defaultWidgets,
   widgetDefinitions,
@@ -81,6 +82,16 @@ function renderWidget(
     );
   }
 
+  if (id === "timeline") {
+    return (
+      <TimelineWidget
+        allowedSizes={definition.allowedSizes}
+        sizes={sizes}
+        editable={editable}
+      />
+    );
+  }
+
   if (id === "coverage") {
     return (
       <CoverageWidget
@@ -113,11 +124,17 @@ function WidgetFrame({
   onRemove: (id: string) => void;
   children: React.ReactNode;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({
-      id: widget.id,
-      disabled: !editable,
-    });
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
+    id: widget.id,
+    disabled: !editable,
+  });
 
   const label = getWidgetDefinition(widget.id)?.label ?? widget.id;
   const smDimensions = widgetSizeDimensions[widget.sizes.sm];
@@ -231,20 +248,24 @@ export function ProfileShowcase({
           settings,
         })),
       }),
-    }).then(async (response) => {
-      if (!response.ok) {
-        const body = (await response.json()) as { error?: unknown };
-        throw new Error(
-          typeof body.error === "string"
-            ? body.error
+    })
+      .then(async (response) => {
+        if (!response.ok) {
+          const body = (await response.json()) as { error?: unknown };
+          throw new Error(
+            typeof body.error === "string"
+              ? body.error
+              : "Unable to save widget layout.",
+          );
+        }
+      })
+      .catch((error: unknown) => {
+        setSaveError(
+          error instanceof Error
+            ? error.message
             : "Unable to save widget layout.",
         );
-      }
-    }).catch((error: unknown) => {
-      setSaveError(
-        error instanceof Error ? error.message : "Unable to save widget layout.",
-      );
-    });
+      });
   }, []);
 
   useEffect(() => {
@@ -295,7 +316,7 @@ export function ProfileShowcase({
         >
           <div
             className={cn(
-              "grid min-w-0 grid-cols-4 auto-rows-[clamp(6rem,24vw,8rem)] gap-3 sm:auto-rows-[clamp(7rem,12vw,9rem)] sm:gap-4",
+              "grid min-w-0 grid-cols-4 auto-rows-[8rem] gap-3 sm:gap-4",
               editable && "max-md:auto-rows-[auto]",
             )}
           >

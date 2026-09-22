@@ -27,6 +27,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { formatUsername } from "@/lib/username";
+import { HeroStats } from "@/components/hero-stats";
 
 const ACCEPTED_TYPES = [
   "image/jpeg",
@@ -370,24 +371,13 @@ export function ProfileHero({
             </Button>
           )}
         </div>
-        <div className="grid grid-cols-3 divide-x border bg-card py-3">
-          <div className="flex flex-col gap-1 px-3">
-            <span className="text-xs text-muted-foreground">
-              Last recorded exercise
-            </span>
-            <span className="text-sm font-medium">0</span>
-          </div>
-          <div className="flex flex-col gap-1 px-3">
-            <span className="text-xs text-muted-foreground">
-              Most recent PR
-            </span>
-            <span className="text-sm font-medium">0</span>
-          </div>
-          <div className="flex flex-col gap-1 px-3">
-            <span className="text-xs text-muted-foreground">Last seen</span>
-            <span className="text-sm font-medium">recently</span>
-          </div>
-        </div>
+        <HeroStats
+          stats={[
+            { label: "Last recorded exercise", value: "0" },
+            { label: "Most recent PR", value: "0" },
+            { label: "Last seen", value: "recently" },
+          ]}
+        />
       </div>
       </section>
       <AlertDialog

@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db";
 import {
   defaultWidgets,
   widgetDefinitions,
+  type ShowcaseId,
   type WidgetSettings,
   type WidgetSize,
   type WidgetSizes,
@@ -28,6 +29,18 @@ export type ProfileWidgetInput = {
   sizes: WidgetSizes;
   settings: WidgetSettings;
 };
+
+const legacyWidgetTypeAliases: Record<string, ShowcaseId> = {
+  "recent-activity": "timeline",
+};
+
+export function normalizeWidgetType(widgetType: string) {
+  return legacyWidgetTypeAliases[widgetType] ?? widgetType;
+}
+
+export function isKnownWidgetType(widgetType: string): widgetType is ShowcaseId {
+  return widgetDefinitions.some((definition) => definition.id === widgetType);
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -98,17 +111,35 @@ export async function loadProfileWidgets(userId: number): Promise<WidgetState[]>
 
   if (savedWidgets.length === 0) return getDefaultWidgetStates();
 
+  const legacyWidgetTypes = new Set(Object.keys(legacyWidgetTypeAliases));
+  const removedWidgetTypes = savedWidgets
+    .map((widget) => widget.widgetType)
+    .filter(
+      (widgetType) =>
+        !isKnownWidgetType(widgetType) && !legacyWidgetTypes.has(widgetType),
+    );
+
+  if (removedWidgetTypes.length > 0) {
+    await prisma.profileWidget.deleteMany({
+      where: {
+        userId,
+        widgetType: { in: removedWidgetTypes },
+      },
+    });
+  }
+
   return savedWidgets.map((widget) => {
+    const widgetType = normalizeWidgetType(widget.widgetType);
     const configuration = parseConfiguration(
-      widget.widgetType,
+      widgetType,
       widget.configuration,
     );
     return {
-      id: widget.widgetType,
+      id: widgetType,
       sizes: configuration.sizes,
       settings: configuration.settings,
     };
-  });
+  }).filter((widget) => isKnownWidgetType(widget.id));
 }
 
 export async function replaceProfileWidgets(

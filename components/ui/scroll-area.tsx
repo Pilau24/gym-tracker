@@ -20,28 +20,8 @@ function ScrollArea({
   const viewportRef = React.useRef<HTMLDivElement>(null)
   const touchStartY = React.useRef<number | null>(null)
   const resetTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
-  const scrollbarTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null)
   const [pullDistance, setPullDistance] = React.useState(0)
   const [isRefreshing, setIsRefreshing] = React.useState(false)
-  const [showScrollbars, setShowScrollbars] = React.useState(false)
-
-  React.useEffect(() => {
-    const viewport = viewportRef.current
-    if (!viewport) return
-
-    const handleViewportScroll = () => {
-      setShowScrollbars(true)
-      if (scrollbarTimer.current) clearTimeout(scrollbarTimer.current)
-      scrollbarTimer.current = setTimeout(() => setShowScrollbars(false), 700)
-    }
-
-    viewport.addEventListener("scroll", handleViewportScroll, { passive: true })
-    return () => {
-      viewport.removeEventListener("scroll", handleViewportScroll)
-      if (resetTimer.current) clearTimeout(resetTimer.current)
-      if (scrollbarTimer.current) clearTimeout(scrollbarTimer.current)
-    }
-  }, [])
 
   function handleTouchStart(event: React.TouchEvent<HTMLDivElement>) {
     if (!pullToRefresh || isRefreshing || event.touches.length !== 1) return
@@ -102,7 +82,7 @@ function ScrollArea({
       <ScrollAreaPrimitive.Viewport
         ref={viewportRef}
         data-slot="scroll-area-viewport"
-        className="size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1"
+        className="size-full rounded-[inherit] [scrollbar-gutter:stable] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-1"
         onTouchStart={pullToRefresh ? handleTouchStart : undefined}
         onTouchMove={pullToRefresh ? handleTouchMove : undefined}
         onTouchEnd={pullToRefresh ? handleTouchEnd : undefined}
@@ -131,8 +111,8 @@ function ScrollArea({
           />
         </div>
       )}
-      <ScrollBar visible={showScrollbars} />
-      <ScrollBar orientation="horizontal" visible={showScrollbars} />
+      <ScrollBar />
+      <ScrollBar orientation="horizontal" />
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
   )
@@ -141,25 +121,22 @@ function ScrollArea({
 function ScrollBar({
   className,
   orientation = "vertical",
-  visible = false,
   ...props
-}: ScrollAreaPrimitive.Scrollbar.Props & { visible?: boolean }) {
+}: ScrollAreaPrimitive.Scrollbar.Props) {
   return (
     <ScrollAreaPrimitive.Scrollbar
       data-slot="scroll-area-scrollbar"
       data-orientation={orientation}
       orientation={orientation}
       className={cn(
-        "flex touch-none select-none rounded-full bg-transparent opacity-0 transition-opacity data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:px-px data-vertical:h-full data-vertical:w-2 data-vertical:py-px",
-        visible && "opacity-60",
-        "hover:opacity-100",
+        "!static flex touch-none select-none rounded-full bg-[var(--scrollbar-track)] opacity-0 transition-opacity data-[hovering]:opacity-[var(--scrollbar-visible-opacity)] data-[scrolling]:opacity-[var(--scrollbar-visible-opacity)] data-horizontal:h-[var(--scrollbar-horizontal-height)] data-horizontal:flex-col data-horizontal:px-px data-horizontal:py-px data-vertical:h-full data-vertical:w-[var(--scrollbar-vertical-width)] data-vertical:py-px hover:opacity-100",
         className
       )}
       {...props}
     >
       <ScrollAreaPrimitive.Thumb
         data-slot="scroll-area-thumb"
-        className="relative flex-1 rounded-full bg-muted-foreground/50 transition-colors hover:bg-foreground/75"
+        className="relative flex-1 rounded-full bg-[var(--scrollbar-thumb)] transition-colors hover:bg-[var(--scrollbar-thumb-hover)] data-vertical:my-2 data-vertical:w-1 data-vertical:flex-none"
       />
     </ScrollAreaPrimitive.Scrollbar>
   )

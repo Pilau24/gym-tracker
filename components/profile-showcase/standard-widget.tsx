@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { StandardWidgetProps } from "./widget-layout";
 
@@ -19,6 +20,7 @@ export function StandardWidget({
   sublabel,
   children,
   editable = false,
+  loading = false,
   className,
   contentClassName,
 }: StandardWidgetProps) {
@@ -64,13 +66,19 @@ export function StandardWidget({
       </CardHeader>
       <CardContent
         className={cn(
-          "min-h-0 flex-1 overflow-hidden border-t border-border/70 p-1.5 transition-[max-height,opacity,padding] duration-300 ease-in-out sm:p-2",
+          "relative min-h-0 flex-1 overflow-hidden border-t border-border/70 p-1.5 transition-[max-height,opacity,padding] duration-300 ease-in-out sm:p-2",
           editable &&
             "max-sm:max-h-0 max-sm:flex-none max-sm:p-0 max-sm:opacity-0",
           contentClassName,
         )}
       >
-        {children}
+        <div className={loading ? "opacity-0" : "contents"}>{children}</div>
+        {loading && (
+          <Skeleton
+            className="absolute inset-2 rounded-none sm:inset-2.5"
+            aria-hidden="true"
+          />
+        )}
       </CardContent>
     </Card>
   );
